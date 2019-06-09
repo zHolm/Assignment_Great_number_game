@@ -8,6 +8,7 @@ app.secret_key ="''asd';b;jjflkhvkhh346878g'"
 def rando():
     session['num'] = random.randint(1,100)
     print(session['num'])
+    session['guess'] = None
     
 
     return render_template("index.html")
@@ -17,19 +18,19 @@ def guess():
     print(f"my number is {session['num']}")
     
     guess= request.form['guess']
-    guess=int(guess)
+    session['guess']=int(guess)
   
 
     if 'guess_arr' in session:
         temp_list = session['guess_arr']
-        temp_list.append(guess)
+        temp_list.append(session['guess'])
         session['guess_arr'] = temp_list
         print('key exists')
     else:
-        session['guess_arr'] = [guess]
+        session['guess_arr'] = [session['guess']]
         print('key doesnt exist')
 
-    number_of_guesses = int(len( session['guess_arr']))
+    session['number_of_guesses'] = int(len( session['guess_arr']))
     
   
    
@@ -37,7 +38,11 @@ def guess():
     print(session['guess_arr'])
     
    
-    return render_template("index.html", num = session['num'] ,guess=guess, number_of_guesses=number_of_guesses)
+    return redirect("/guess")
+
+@app.route("/guess")
+def make_guess():
+    return render_template("index.html", num = session['num'], guess=session['guess'], number_of_guesses=session['number_of_guesses'])
 
 @app.route("/destroy_session")
 def reset():
